@@ -1,6 +1,8 @@
 # ignore builds
 target/
 
+build/
+
 # Prerequisites
 *.d
 
