@@ -18,5 +18,5 @@ make hello
 ```bash
 ./build.sh
 ./run.sh
-wrk http://localhost
+wrk http://localhost:8080/ -R 1
 ```
