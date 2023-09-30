@@ -2,16 +2,16 @@
 #include "main.h"
 
 static void on_http_request(http_s *h) {
-  static char uuid[37] = {0};
+  char uuid[37] = {0};
   gen_uuid(&uuid);
-  printf("UUID generated:\n");
-  for(int i=0;i<=36;i++){
+  printf("UUID generated:\n[");
+  for(int i=0;i<36;i++){
     printf("%c",uuid[i]);
   }
-  printf("\n");
+  printf("]\n");
 
   http_set_header(h, HTTP_HEADER_CONTENT_TYPE, http_mimetype_find("txt", 3));
-  http_send_body(h, uuid, 37);
+  http_send_body(h, &uuid, 37);
 }
 
 void gen_uuid(char *buf[]) {
