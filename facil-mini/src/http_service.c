@@ -5,18 +5,18 @@ static void on_http_request(http_s *h) {
   char uuid[37] = {0};
   gen_uuid(&uuid);
   printf("UUID generated:\n[");
-  for(int i=0;i<36; ++i){
+  for(int i=0;i<36; i++){
     printf("%c",uuid[i]);
   }
   printf("]\n");
 
   http_set_header(h, HTTP_HEADER_CONTENT_TYPE, http_mimetype_find("txt", 3));
-  http_send_body(h, &uuid, 37);
+  http_send_body(h, uuid, 37);
 }
 
 void gen_uuid(char *buf[]) {
     char v[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    for(int i = 0; i < 36; ++i) {
+    for(int i = 0; i < 36; i++) {
         buf[i] = v[rand()%16];
     }
     buf[8] = '-';
