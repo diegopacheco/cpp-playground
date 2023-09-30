@@ -5,7 +5,7 @@ static void on_http_request(http_s *h) {
   char uuid[37] = {0};
   gen_uuid(&uuid);
   printf("UUID generated:\n[");
-  for(int i=0;i<36;i++){
+  for(int i=0;i<36; ++i){
     printf("%c",uuid[i]);
   }
   printf("]\n");
