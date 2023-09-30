@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "*.julia": "julia",
-        "http.h": "c"
+        "http.h": "c",
+        "cstdlib": "c",
+        "algorithm": "c"
     }
 }

@@ -3,28 +3,21 @@
 
 static void on_http_request(http_s *h) {
   char uuid[37] = {0};
-  gen_uuid(&uuid);
-  printf("UUID generated:\n[");
-  for(int i=0;i<36; i++){
-    printf("%c",uuid[i]);
-  }
-  printf("]\n");
-
-  http_set_header(h, HTTP_HEADER_CONTENT_TYPE, http_mimetype_find("txt", 3));
+  gen_uuid(uuid);
+  //http_set_header(h, HTTP_HEADER_CONTENT_TYPE, http_mimetype_find("plain/text", 10));
   http_send_body(h, uuid, 37);
 }
 
-void gen_uuid(char *buf[]) {
+void gen_uuid(char buf[37]){
     char v[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    for(int i = 0; i < 36; i++) {
-        buf[i] = v[rand()%16];
+    for (int i = 0; i < 36; i++){
+        buf[i] = v[rand() % 16];
     }
     buf[8] = '-';
     buf[13] = '-';
     buf[18] = '-';
     buf[23] = '-';
     buf[36] = '\0';
-    return buf;
 }
 
 void initialize_http_service(void) {
