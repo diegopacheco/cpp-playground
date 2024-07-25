@@ -1,9 +1,6 @@
-#include <iostream>
-using namespace std;
-import mymath;
-
+// main.cpp
+import helloworld;
+ 
 int main(){
-    cout << add(2,2) << endl;
-    cout << multiply(2,3) << endl;
-    return 0;
+    hello();
 }
