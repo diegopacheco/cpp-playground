@@ -4,18 +4,11 @@ rm -rf target/
 mkdir -p target/
 mkdir -p gcm.cache/
 
-# Compile custom modules first (assuming helloworld.cpp defines a module)
-g++-14 -std=c++20 -fmodules-ts -c src/helloworld.cpp -o target/helloworld.o
+# Compile the module interface unit for 'helloworld'
+g++-11 -std=c++20 -fmodules-ts -c src/helloworld.cpp -o target/helloworld.o
 
-# Then compile other files
-for file in src/*.cpp; do
-    if [[ $(basename -- "$file") != "helloworld.cpp" ]]; then
-        filename=$(basename -- "$file")
-        filename="${filename%.*}"
-        
-        g++-14 -std=c++20 -fmodules-ts -c "$file" -o "target/${filename}.o"
-    fi
-done
+# Compile the main program
+g++-11 -std=c++20 -fmodules-ts -c src/main.cpp -o target/main.o
 
-# Link all object files to create the executable
-g++-14 -std=c++20 target/*.o -o target/main
+# Link the program
+g++-11 -std=c++20 -o target/main target/helloworld.o target/main.o
