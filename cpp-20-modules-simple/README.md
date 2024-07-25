@@ -33,5 +33,4 @@ gcc version 14.1.0 (Homebrew GCC 14.1.0_2)
 ❯ ./run.sh
 1+2 = 3
 3-2 = 1
-
 ```
