@@ -1,0 +1,7 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "*.julia": "julia",
+        "system_error": "cpp"
+    }
+}
