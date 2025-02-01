@@ -32,15 +32,19 @@ void handleClient(Client client) {
 
     while ((bytesRead = recv(client.socket, buffer, sizeof(buffer), 0)) > 0) {
         buffer[bytesRead] = '\0';
-        int guess = stoi(buffer);
-        
-        if (guess == secretNumber) {
-            string winMessage = client.name + " has guessed the correct number: " + to_string(secretNumber) + "\n";
-            broadcast(winMessage);
-            break;
-        } else {
-            string response = "Wrong guess! Try again.\n";
-            send(client.socket, response.c_str(), response.size(), 0);
+        try {
+            int guess = stoi(buffer);
+            if (guess == secretNumber) {
+                string winMessage = client.name + " has guessed the correct number: " + to_string(secretNumber) + "\n";
+                broadcast(winMessage);
+                break;
+            } else {
+                string message = "Wrong guess, try again.\n";
+                send(client.socket, message.c_str(), message.size(), 0);
+            }
+        } catch (const invalid_argument& e) {
+            string errorMessage = "Invalid input, please enter a number.\n";
+            send(client.socket, errorMessage.c_str(), errorMessage.size(), 0);
         }
     }
 
@@ -49,11 +53,11 @@ void handleClient(Client client) {
 
 int main() {
     srand(time(0));
-    secretNumber = rand() % 100 + 1; // Random number between 1 and 100
+    secretNumber = rand() % 100 + 1;
 
     int serverSocket, clientSocket;
     struct sockaddr_in serverAddr, clientAddr;
-    socklen_t addrLen = sizeof(clientAddr);
+    socklen_t clientAddrLen = sizeof(clientAddr);
 
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     serverAddr.sin_family = AF_INET;
@@ -66,21 +70,15 @@ int main() {
     cout << "Server is listening on port " << PORT << endl;
 
     while (true) {
-        clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
-        if (clientSocket < 0) {
-            cerr << "Failed to accept client" << endl;
-            continue;
-        }
-
+        clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &clientAddrLen);
         char nameBuffer[1024];
         recv(clientSocket, nameBuffer, sizeof(nameBuffer), 0);
-        string clientName(nameBuffer);
-        clients.push_back({clientSocket, clientName});
+        string clientName = nameBuffer;
 
-        string welcomeMessage = clientName + " has joined the game!\n";
-        broadcast(welcomeMessage);
+        Client client = {clientSocket, clientName};
+        clients.push_back(client);
 
-        thread(handleClient, clients.back()).detach();
+        thread(handleClient, client).detach();
     }
 
     close(serverSocket);
