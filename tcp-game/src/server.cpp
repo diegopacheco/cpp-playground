@@ -39,7 +39,12 @@ void handleClient(Client client) {
                 broadcast(winMessage);
                 break;
             } else {
-                string message = "Wrong guess, try again.\n";
+                string message = "";
+                if (guess < secretNumber) {
+                    message = "The secret number is greater than " + to_string(guess) + "\n";
+                } else {
+                    message = "The secret number is less than " + to_string(guess) + "\n";
+                }
                 send(client.socket, message.c_str(), message.size(), 0);
             }
         } catch (const invalid_argument& e) {
