@@ -82,6 +82,7 @@ int main() {
 
         Client client = {clientSocket, clientName};
         clients.push_back(client);
+        cout << "Client connected: " << clientName << endl;
 
         thread(handleClient, client).detach();
     }
