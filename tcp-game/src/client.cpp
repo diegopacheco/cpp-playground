@@ -48,14 +48,14 @@ int main() {
         send(sock, &guess, sizeof(guess), 0);
         
         // Receive result from server
-        int result;
+        string result;
         recv(sock, &result, sizeof(result), 0);
         
-        if (result == 1) {
+        if (result == "1") {
             cout << "Congratulations! You guessed the correct number!" << endl;
             break;
         } else {
-            cout << "Wrong guess, try again!" << endl;
+            cout << result << endl;
         }
     }
 
