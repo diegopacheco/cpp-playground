@@ -7,11 +7,44 @@ This project is a simple client/server application implemented in C++ using sock
 ```
 cpp-game-app
 ├── src
-│   ├── client.cpp        # Client-side application implementation
-│   ├── server.cpp        # Server-side application implementation
+│   ├── client.cpp        # client impl
+│   ├── server.cpp        # game server impl
 │   └── common
-│       └── utils.cpp     # Utility functions implementation
-│       └── utils.h       # Utility functions declarations
-├── CMakeLists.txt        # CMake configuration file
-└── README.md             # Project documentation
+│       └── utils.cpp     # shared code between client and server
+│       └── utils.h       # 
+├── CMakeLists.txt        # CMake build file
+├── README.md             # README
+└── build.sh              # build script
+```
+
+### Buid
+
+```bash
+./build.sh
+```
+
+### Run
+
+Server
+
+```bash
+./build/server
+```
+
+```
+Server is listening on port 8080
+```
+
+Client
+
+```bash
+./build/client
+```
+
+```
+❯ ./client
+Enter your name: diego
+Guess a number (1-100): 1
+Wrong guess, try again!
+Guess a number (1-100): 
 ```
