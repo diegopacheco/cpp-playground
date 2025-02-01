@@ -17,9 +17,15 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string input = argv[1];
-    string hexOutput = stringToHex(input);
+    string input;
+    for (int i = 1; i < argc; ++i) {
+        input += argv[i];
+        if (i < argc - 1) {
+            input += " ";
+        }
+    }
 
-    cout << "Hexadecimal representation: " << hexOutput << endl;
+    string hexOutput = stringToHex(input);
+    cout << "Hexadecimal: " << hexOutput << endl;
     return 0;
 }
