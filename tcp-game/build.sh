@@ -2,4 +2,8 @@
 
 rm -rf target/
 mkdir target/
-g++ -std=c++20 -o target/main src/*.cpp #-ljsoncpp
+
+cd target/
+cmake ..
+make
+
