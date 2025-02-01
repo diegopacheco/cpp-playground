@@ -15,6 +15,14 @@ string hex_to_string(const string& hex) {
     return result;
 }
 
+string add_spaces(const string& hex) {
+    string spaced_hex;
+    for (size_t i = 0; i < hex.length(); i += 2) {
+        spaced_hex += hex.substr(i, 2) + " ";
+    }
+    return spaced_hex;
+}
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         cout << "Usage: " << argv[0] << " <hex_string>" << endl;
@@ -23,7 +31,7 @@ int main(int argc, char* argv[]) {
 
     string hex_string = argv[1];
     string result = hex_to_string(hex_string);
-    cout << "Hex: " << hex_string << endl;
+    cout << "Hex: " << add_spaces(hex_string) << endl;
     cout << "String: " << result << endl;
     return 0;
 }
