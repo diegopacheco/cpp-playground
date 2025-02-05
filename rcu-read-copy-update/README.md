@@ -14,7 +14,7 @@ The Linux kernel uses RCU in several places to improve performance and scalabili
 
 Java has something similar called COW(Copy On Write) which you can see in CopyOnWriteArrayList.
 
-RCU is efficient if you dont have many updates, otherwise there is a memory overhead. 
+RCU is efficient if you dont have many updates, otherwise there is a memory overhead.
 
 ### Alternatives
 
@@ -29,4 +29,4 @@ Other models and alternatives include:
 * https://blog.envoyproxy.io/envoy-threading-model-a8d44b922310
 * https://en.wikipedia.org/wiki/Read-copy-update
 * https://www.youtube.com/watch?v=rxQ5K9lo034&ab_channel=CppCon
-* https://en.wikipedia.org/wiki/Copy-on-write#:~:text=Copy%2Don%2Dwrite%20(COW,one%20tries%20to%20modify%20it.
+* https://en.wikipedia.org/wiki/Copy-on-write
