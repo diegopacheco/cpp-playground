@@ -4,6 +4,8 @@ RCU (Read-Copy-Update) is a synchronization mechanism that allows multiple reade
 
 In computer science, read-copy-update (RCU) is a synchronization mechanism that avoids the use of lock primitives while multiple threads concurrently read and update elements that are linked through pointers and that belong to shared data structures (e.g., linked lists, trees, hash tables).[1]
 
+RCU is efficient if you dont have many updates, otherwise there is a memory overhead. 
+
 ### Alternatives
 
 Other models and alternatives include:
