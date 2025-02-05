@@ -2,10 +2,9 @@
 #include <thread>
 #include <vector>
 #include <atomic>
-#include <mutex>
+#include <memory>
 
 std::atomic<int*> data(new int(0));
-std::mutex writer_mtx;
 
 void reader(int id) {
     int* local_data = data.load();
@@ -13,9 +12,9 @@ void reader(int id) {
 }
 
 void writer(int new_value) {
-    std::lock_guard<std::mutex> lock(writer_mtx);
     int* new_data = new int(new_value);
-    data.store(new_data);
+    int* old_data = data.exchange(new_data);
+    delete old_data;
 }
 
 int main() {
