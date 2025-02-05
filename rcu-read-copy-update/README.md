@@ -30,3 +30,4 @@ Other models and alternatives include:
 * https://en.wikipedia.org/wiki/Read-copy-update
 * https://www.youtube.com/watch?v=rxQ5K9lo034&ab_channel=CppCon
 * https://en.wikipedia.org/wiki/Copy-on-write
+* https://github.com/diegopacheco/java-pocs/tree/master/pocs/cow-copy-onwrite-arraylist
