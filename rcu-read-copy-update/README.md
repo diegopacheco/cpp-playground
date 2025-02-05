@@ -14,5 +14,7 @@ Other models and alternatives include:
 
 ### Links
 
-https://blog.envoyproxy.io/envoy-threading-model-a8d44b922310
-https://en.wikipedia.org/wiki/Read-copy-update
+* https://blog.envoyproxy.io/envoy-threading-model-a8d44b922310
+* https://en.wikipedia.org/wiki/Read-copy-update
+* https://www.youtube.com/watch?v=rxQ5K9lo034&ab_channel=CppCon
+* https://en.wikipedia.org/wiki/Copy-on-write#:~:text=Copy%2Don%2Dwrite%20(COW,one%20tries%20to%20modify%20it.
