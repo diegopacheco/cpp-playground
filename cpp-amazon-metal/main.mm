@@ -749,18 +749,29 @@ simd_float4x4 matrix_rotation_y(float angle) {
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
-    NSRect frame = NSMakeRect(100, 100, 1280, 720);
+    NSRect screenRect = [[NSScreen mainScreen] frame];
+    NSRect frame = NSMakeRect((screenRect.size.width - 1280) / 2,
+                              (screenRect.size.height - 720) / 2,
+                              1280, 720);
     _window = [[NSWindow alloc] initWithContentRect:frame
-                                          styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable
+                                          styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable
                                             backing:NSBackingStoreBuffered
                                               defer:NO];
     [_window setTitle:@"Amazon Rainforest - WASD to move, Mouse to look, Space/Shift for up/down, ESC to release mouse"];
+    [_window setReleasedWhenClosed:NO];
 
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-    GameView *view = [[GameView alloc] initWithFrame:frame device:device];
+    if (!device) {
+        NSLog(@"Metal is not supported on this device");
+        [NSApp terminate:nil];
+        return;
+    }
+
+    GameView *view = [[GameView alloc] initWithFrame:_window.contentView.bounds device:device];
     view.colorPixelFormat = MTLPixelFormatBGRA8Unorm;
     view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     view.clearColor = MTLClearColorMake(0.4, 0.45, 0.5, 1.0);
+    view.preferredFramesPerSecond = 60;
 
     _renderer = [[Renderer alloc] initWithMetalKitView:view];
     view.delegate = _renderer;
@@ -768,10 +779,8 @@ simd_float4x4 matrix_rotation_y(float angle) {
 
     [_window setContentView:view];
     [_window makeFirstResponder:view];
+    [_window center];
     [_window makeKeyAndOrderFront:nil];
-
-    [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-    [NSApp activateIgnoringOtherApps:YES];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
@@ -783,8 +792,20 @@ simd_float4x4 matrix_rotation_y(float angle) {
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         NSApplication *app = [NSApplication sharedApplication];
+        [app setActivationPolicy:NSApplicationActivationPolicyRegular];
+
+        NSMenu *menubar = [[NSMenu alloc] init];
+        NSMenuItem *appMenuItem = [[NSMenuItem alloc] init];
+        [menubar addItem:appMenuItem];
+        NSMenu *appMenu = [[NSMenu alloc] init];
+        NSMenuItem *quitItem = [[NSMenuItem alloc] initWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
+        [appMenu addItem:quitItem];
+        [appMenuItem setSubmenu:appMenu];
+        [app setMainMenu:menubar];
+
         AppDelegate *delegate = [[AppDelegate alloc] init];
         [app setDelegate:delegate];
+        [app activateIgnoringOtherApps:YES];
         [app run];
     }
     return 0;
