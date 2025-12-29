@@ -4,4 +4,4 @@ Using Apple Metal.
 
 ## Result
 
-<img src="" width="600"/>
+<img src="amazon-rainforest-scene-apple-metal.png" width="600"/>
