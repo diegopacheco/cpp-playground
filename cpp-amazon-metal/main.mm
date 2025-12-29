@@ -382,7 +382,7 @@ simd_float4x4 matrix_rotation_y(float angle) {
     std::uniform_real_distribution<float> heightDist(8, 18);
     std::uniform_real_distribution<float> radiusDist(0.3, 0.6);
 
-    for (int t = 0; t < 80; t++) {
+    for (int t = 0; t < 25; t++) {
         std::vector<Vertex> vertices;
         float x = posDist(rng);
         float z = posDist(rng);
@@ -423,7 +423,7 @@ simd_float4x4 matrix_rotation_y(float angle) {
     std::mt19937 rng(123);
     std::uniform_real_distribution<float> posDist(-40, 40);
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 3; i++) {
         std::vector<Vertex> vertices;
         float x = posDist(rng);
         float z = posDist(rng);
@@ -450,7 +450,7 @@ simd_float4x4 matrix_rotation_y(float angle) {
         [_animalPositions addObject:transformValue];
     }
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 2; i++) {
         std::vector<Vertex> vertices;
         float x = posDist(rng);
         float z = posDist(rng);
@@ -478,7 +478,7 @@ simd_float4x4 matrix_rotation_y(float angle) {
         [_animalPositions addObject:transformValue];
     }
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 2; i++) {
         std::vector<Vertex> vertices;
         float x = posDist(rng);
         float z = posDist(rng);
@@ -505,7 +505,7 @@ simd_float4x4 matrix_rotation_y(float angle) {
         [_animalPositions addObject:transformValue];
     }
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 3; i++) {
         std::vector<Vertex> vertices;
         float x = posDist(rng);
         float z = posDist(rng);
@@ -537,7 +537,7 @@ simd_float4x4 matrix_rotation_y(float angle) {
         [_animalPositions addObject:transformValue];
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 2; i++) {
         std::vector<Vertex> vertices;
         float x = posDist(rng);
         float z = posDist(rng);
@@ -577,7 +577,7 @@ simd_float4x4 matrix_rotation_y(float angle) {
     std::uniform_real_distribution<float> velDist(0, 1);
 
     std::vector<RainParticle> particles;
-    _rainParticleCount = 8000;
+    _rainParticleCount = 3000;
 
     for (NSUInteger i = 0; i < _rainParticleCount; i++) {
         RainParticle p;
