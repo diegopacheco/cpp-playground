@@ -2,6 +2,7 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 #import <simd/simd.h>
+#import <ApplicationServices/ApplicationServices.h>
 #include <vector>
 #include <cmath>
 #include <random>
@@ -106,6 +107,7 @@ simd_float4x4 matrix_rotation_y(float angle) {
 @implementation Renderer
 
 - (instancetype)initWithMetalKitView:(MTKView *)view {
+    NSLog(@"Renderer init starting...");
     self = [super init];
     if (self) {
         _device = view.device;
@@ -121,20 +123,28 @@ simd_float4x4 matrix_rotation_y(float angle) {
         _time = 0;
 
         [self setupPipelines:view];
+        NSLog(@"Generating ground...");
         [self generateGround];
+        NSLog(@"Generating trees...");
         [self generateTrees];
+        NSLog(@"Generating animals...");
         [self generateAnimals];
+        NSLog(@"Generating rain...");
         [self generateRain];
+        NSLog(@"Renderer init complete");
     }
     return self;
 }
 
 - (void)setupPipelines:(MTKView *)view {
+    NSLog(@"setupPipelines starting...");
     NSError *error;
     id<MTLLibrary> library = nil;
 
     NSString *execPath = [[NSBundle mainBundle] executablePath];
     NSString *execDir = [execPath stringByDeletingLastPathComponent];
+    NSLog(@"Exec dir: %@", execDir);
+
     NSArray *searchPaths = @[
         [execDir stringByAppendingPathComponent:@"Shaders.metal"],
         [execDir stringByAppendingPathComponent:@"../Shaders.metal"],
@@ -143,21 +153,33 @@ simd_float4x4 matrix_rotation_y(float angle) {
     ];
 
     NSString *source = nil;
+    NSString *foundPath = nil;
     for (NSString *path in searchPaths) {
+        NSLog(@"Trying shader path: %@", path);
         source = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
-        if (source) break;
+        if (source) {
+            foundPath = path;
+            NSLog(@"Found shaders at: %@", path);
+            break;
+        }
     }
 
-    if (source) {
-        MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
-        library = [_device newLibraryWithSource:source options:options error:&error];
-    }
-
-    if (!library) {
-        NSLog(@"Failed to load shaders: %@", error);
+    if (!source) {
+        NSLog(@"Could not find Shaders.metal file!");
         [NSApp terminate:nil];
         return;
     }
+
+    NSLog(@"Compiling shaders...");
+    MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
+    library = [_device newLibraryWithSource:source options:options error:&error];
+
+    if (!library) {
+        NSLog(@"Failed to compile shaders: %@", error);
+        [NSApp terminate:nil];
+        return;
+    }
+    NSLog(@"Shaders compiled successfully");
 
     MTLVertexDescriptor *vertexDescriptor = [[MTLVertexDescriptor alloc] init];
     vertexDescriptor.attributes[0].format = MTLVertexFormatFloat3;
@@ -762,16 +784,19 @@ simd_float4x4 matrix_rotation_y(float angle) {
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
+    NSLog(@"applicationDidFinishLaunching called");
+
     NSRect screenRect = [[NSScreen mainScreen] frame];
-    NSRect frame = NSMakeRect((screenRect.size.width - 1280) / 2,
-                              (screenRect.size.height - 720) / 2,
-                              1280, 720);
+    NSLog(@"Screen size: %.0f x %.0f", screenRect.size.width, screenRect.size.height);
+
+    NSRect frame = NSMakeRect(100, 100, 1280, 720);
     _window = [[NSWindow alloc] initWithContentRect:frame
                                           styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable
                                             backing:NSBackingStoreBuffered
                                               defer:NO];
     [_window setTitle:@"Amazon Rainforest - WASD to move, Mouse to look, Space/Shift for up/down, ESC to release mouse"];
     [_window setReleasedWhenClosed:NO];
+    NSLog(@"Window created");
 
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     if (!device) {
@@ -779,21 +804,28 @@ simd_float4x4 matrix_rotation_y(float angle) {
         [NSApp terminate:nil];
         return;
     }
+    NSLog(@"Metal device: %@", device.name);
 
-    GameView *view = [[GameView alloc] initWithFrame:_window.contentView.bounds device:device];
+    GameView *view = [[GameView alloc] initWithFrame:frame device:device];
     view.colorPixelFormat = MTLPixelFormatBGRA8Unorm;
     view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     view.clearColor = MTLClearColorMake(0.4, 0.45, 0.5, 1.0);
     view.preferredFramesPerSecond = 60;
+    NSLog(@"MTKView created");
 
     _renderer = [[Renderer alloc] initWithMetalKitView:view];
     view.delegate = _renderer;
     view.renderer = _renderer;
+    NSLog(@"Renderer created");
 
     [_window setContentView:view];
     [_window makeFirstResponder:view];
     [_window center];
+    [_window setLevel:NSFloatingWindowLevel];
+    [_window orderFrontRegardless];
     [_window makeKeyAndOrderFront:nil];
+    [NSApp activateIgnoringOtherApps:YES];
+    NSLog(@"Window should be visible now");
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
@@ -804,8 +836,13 @@ simd_float4x4 matrix_rotation_y(float angle) {
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
+        NSLog(@"Starting Amazon Rainforest...");
+
         NSApplication *app = [NSApplication sharedApplication];
         [app setActivationPolicy:NSApplicationActivationPolicyRegular];
+
+        ProcessSerialNumber psn = {0, kCurrentProcess};
+        TransformProcessType(&psn, kProcessTransformToForegroundApplication);
 
         NSMenu *menubar = [[NSMenu alloc] init];
         NSMenuItem *appMenuItem = [[NSMenuItem alloc] init];
