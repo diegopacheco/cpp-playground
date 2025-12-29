@@ -146,18 +146,41 @@ vertex SF svmain(SV v [[stage_in]], constant U& u [[buffer(1)]]) {
     return o;
 }
 
+float hash(float2 p) { return fract(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }
+
 fragment float4 sfmain(SF f [[stage_in]], constant U& u [[buffer(1)]]) {
-    float3 top = float3(0.2, 0.25, 0.35);
-    float3 mid = float3(0.45, 0.55, 0.65);
-    float3 bot = float3(0.5, 0.6, 0.55);
+    float3 top = float3(0.08, 0.1, 0.2);
+    float3 mid = float3(0.25, 0.35, 0.45);
+    float3 bot = float3(0.35, 0.45, 0.4);
     float y = f.uv.y;
     float3 col;
     if (y > 0.5) col = mix(mid, top, (y - 0.5) * 2.0);
     else col = mix(bot, mid, y * 2.0);
-    float clouds = sin(f.uv.x * 8.0 + u.time * 0.1) * cos(f.uv.y * 4.0) * 0.1 + 0.1;
-    clouds += sin(f.uv.x * 3.0 - u.time * 0.05) * cos(f.uv.y * 6.0 + u.time * 0.02) * 0.08;
-    col += clouds * float3(0.3, 0.3, 0.35) * (1.0 - u.rain * 0.5);
-    col = mix(col, u.fogColor, u.rain * 0.3);
+
+    float2 starUV = f.uv * 80.0;
+    float2 starID = floor(starUV);
+    float2 starF = fract(starUV) - 0.5;
+    float starRand = hash(starID);
+    float starDist = length(starF);
+    float star = smoothstep(0.1, 0.0, starDist) * step(0.92, starRand);
+    float twinkle = sin(u.time * 3.0 + starRand * 20.0) * 0.3 + 0.7;
+    star *= twinkle * (1.0 - u.rain * 0.8);
+    float starY = smoothstep(0.4, 0.8, y);
+    col += star * starY * float3(1.0, 1.0, 0.95);
+
+    float2 starUV2 = f.uv * 40.0 + 100.0;
+    float2 starID2 = floor(starUV2);
+    float2 starF2 = fract(starUV2) - 0.5;
+    float starRand2 = hash(starID2);
+    float star2 = smoothstep(0.15, 0.0, length(starF2)) * step(0.95, starRand2);
+    star2 *= (sin(u.time * 2.5 + starRand2 * 15.0) * 0.4 + 0.6) * (1.0 - u.rain * 0.8);
+    col += star2 * starY * float3(0.9, 0.95, 1.0) * 1.5;
+
+    float clouds = sin(f.uv.x * 6.0 + u.time * 0.08) * cos(f.uv.y * 3.0) * 0.12;
+    clouds += sin(f.uv.x * 2.5 - u.time * 0.04) * cos(f.uv.y * 5.0 + u.time * 0.015) * 0.1;
+    clouds += sin(f.uv.x * 10.0 + u.time * 0.12) * cos(f.uv.y * 8.0) * 0.05;
+    col += clouds * float3(0.25, 0.28, 0.35) * (1.0 - u.rain * 0.4);
+    col = mix(col, u.fogColor * 0.8, u.rain * 0.25);
     return float4(col, 1.0);
 }
     )";
@@ -463,11 +486,20 @@ fragment float4 sfmain(SF f [[stage_in]], constant U& u [[buffer(1)]]) {
 
 @interface GameView : MTKView
 @property (nonatomic, weak) Renderer *renderer;
+@property (nonatomic, assign) BOOL mouseCaptured;
 @end
 
 @implementation GameView
 - (BOOL)acceptsFirstResponder { return YES; }
 - (void)keyDown:(NSEvent *)e {
+    if (e.keyCode == 53) {
+        if (_mouseCaptured) {
+            CGAssociateMouseAndMouseCursorPosition(true);
+            [NSCursor unhide];
+            _mouseCaptured = NO;
+        }
+        return;
+    }
     switch (e.keyCode) {
         case 13: _renderer.keyW = YES; break;
         case 0: _renderer.keyA = YES; break;
@@ -487,10 +519,28 @@ fragment float4 sfmain(SF f [[stage_in]], constant U& u [[buffer(1)]]) {
         case 56: case 60: _renderer.keyShift = NO; break;
     }
 }
+- (void)mouseDown:(NSEvent *)e {
+    if (!_mouseCaptured) {
+        CGAssociateMouseAndMouseCursorPosition(false);
+        [NSCursor hide];
+        _mouseCaptured = YES;
+    }
+}
+- (void)mouseMoved:(NSEvent *)e {
+    if (_mouseCaptured) {
+        _renderer.cameraYaw += e.deltaX * 0.003f;
+        _renderer.cameraPitch -= e.deltaY * 0.003f;
+        _renderer.cameraPitch = fminf(fmaxf(_renderer.cameraPitch, -1.5f), 1.5f);
+    }
+}
 - (void)mouseDragged:(NSEvent *)e {
-    _renderer.cameraYaw += e.deltaX * 0.005f;
-    _renderer.cameraPitch -= e.deltaY * 0.005f;
-    _renderer.cameraPitch = fminf(fmaxf(_renderer.cameraPitch, -1.4f), 1.4f);
+    [self mouseMoved:e];
+}
+- (BOOL)acceptsMouseMovedEvents { return YES; }
+- (void)updateTrackingAreas {
+    [super updateTrackingAreas];
+    for (NSTrackingArea *area in self.trackingAreas) [self removeTrackingArea:area];
+    [self addTrackingArea:[[NSTrackingArea alloc] initWithRect:self.bounds options:NSTrackingMouseMoved|NSTrackingActiveAlways|NSTrackingInVisibleRect owner:self userInfo:nil]];
 }
 @end
 
