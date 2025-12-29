@@ -131,19 +131,32 @@ simd_float4x4 matrix_rotation_y(float angle) {
 
 - (void)setupPipelines:(MTKView *)view {
     NSError *error;
-    NSString *shaderPath = [[NSBundle mainBundle] pathForResource:@"Shaders" ofType:@"metallib"];
-    id<MTLLibrary> library;
-    if (shaderPath) {
-        library = [_device newLibraryWithFile:shaderPath error:&error];
+    id<MTLLibrary> library = nil;
+
+    NSString *execPath = [[NSBundle mainBundle] executablePath];
+    NSString *execDir = [execPath stringByDeletingLastPathComponent];
+    NSArray *searchPaths = @[
+        [execDir stringByAppendingPathComponent:@"Shaders.metal"],
+        [execDir stringByAppendingPathComponent:@"../Shaders.metal"],
+        @"Shaders.metal",
+        @"./Shaders.metal"
+    ];
+
+    NSString *source = nil;
+    for (NSString *path in searchPaths) {
+        source = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
+        if (source) break;
     }
-    if (!library) {
-        NSString *sourcePath = @"Shaders.metal";
-        NSString *source = [NSString stringWithContentsOfFile:sourcePath encoding:NSUTF8StringEncoding error:&error];
-        if (!source) {
-            source = [NSString stringWithContentsOfFile:@"./Shaders.metal" encoding:NSUTF8StringEncoding error:&error];
-        }
+
+    if (source) {
         MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
         library = [_device newLibraryWithSource:source options:options error:&error];
+    }
+
+    if (!library) {
+        NSLog(@"Failed to load shaders: %@", error);
+        [NSApp terminate:nil];
+        return;
     }
 
     MTLVertexDescriptor *vertexDescriptor = [[MTLVertexDescriptor alloc] init];
