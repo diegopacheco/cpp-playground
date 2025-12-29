@@ -794,9 +794,13 @@ simd_float4x4 matrix_rotation_y(float angle) {
                                           styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable
                                             backing:NSBackingStoreBuffered
                                               defer:NO];
-    [_window setTitle:@"Amazon Rainforest - WASD to move, Mouse to look, Space/Shift for up/down, ESC to release mouse"];
+    [_window setTitle:@"Amazon Rainforest - Loading..."];
     [_window setReleasedWhenClosed:NO];
-    NSLog(@"Window created");
+    [_window setBackgroundColor:[NSColor colorWithRed:0.2 green:0.3 blue:0.2 alpha:1.0]];
+    [_window center];
+    [_window makeKeyAndOrderFront:nil];
+    [NSApp activateIgnoringOtherApps:YES];
+    NSLog(@"Window created and shown");
 
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     if (!device) {
@@ -806,7 +810,7 @@ simd_float4x4 matrix_rotation_y(float angle) {
     }
     NSLog(@"Metal device: %@", device.name);
 
-    GameView *view = [[GameView alloc] initWithFrame:frame device:device];
+    GameView *view = [[GameView alloc] initWithFrame:_window.contentView.bounds device:device];
     view.colorPixelFormat = MTLPixelFormatBGRA8Unorm;
     view.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
     view.clearColor = MTLClearColorMake(0.4, 0.45, 0.5, 1.0);
@@ -820,12 +824,8 @@ simd_float4x4 matrix_rotation_y(float angle) {
 
     [_window setContentView:view];
     [_window makeFirstResponder:view];
-    [_window center];
-    [_window setLevel:NSFloatingWindowLevel];
-    [_window orderFrontRegardless];
-    [_window makeKeyAndOrderFront:nil];
-    [NSApp activateIgnoringOtherApps:YES];
-    NSLog(@"Window should be visible now");
+    [_window setTitle:@"Amazon Rainforest - WASD to move, Mouse to look, Space/Shift for up/down, ESC to release mouse"];
+    NSLog(@"Window ready");
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
